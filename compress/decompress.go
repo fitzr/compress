@@ -9,11 +9,11 @@ import (
 
 func Decompress(r io.Reader, w io.Writer) {
 	writer := bufio.NewWriter(w)
-	for decompressLine(r, *writer) {
+	for decompressLine(r, writer) {
 	}
 }
 
-func decompressLine(r io.Reader, w bufio.Writer) bool {
+func decompressLine(r io.Reader, w *bufio.Writer) bool {
 	name, idBytes, err := Unpack(r)
 	if err != nil {
 		log.Println("unpack line error : ", err)
