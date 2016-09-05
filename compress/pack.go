@@ -5,46 +5,58 @@ import (
 	"io"
 )
 
-func Pack(w io.Writer, word, tags []byte) {
+func Pack(w io.Writer, word, tags []byte) (err error) {
 	wordLen := uint32(len(word))
 	tagsLen := uint32(len(tags))
 
-	err := binary.Write(w, binary.LittleEndian, wordLen)
-	check(err)
+	err = binary.Write(w, binary.LittleEndian, wordLen)
+	if err != nil {
+		return
+	}
 
 	err = binary.Write(w, binary.LittleEndian, tagsLen)
-	check(err)
+	if err != nil {
+		return
+	}
 
 	_, err = w.Write(word)
-	check(err)
+	if err != nil {
+		return
+	}
 
 	_, err = w.Write(tags)
-	check(err)
+	if err != nil {
+		return
+	}
+
+	return
 }
 
-func Unpack(r io.Reader) (word, tags []byte) {
+func Unpack(r io.Reader) (word, tags []byte, err error) {
 	var wordLen uint32
 	var tagsLen uint32
-	err := binary.Read(r, binary.LittleEndian, &wordLen)
-	check(err)
+	err = binary.Read(r, binary.LittleEndian, &wordLen)
+	if err != nil {
+		return
+	}
 
 	err = binary.Read(r, binary.LittleEndian, &tagsLen)
-	check(err)
+	if err != nil {
+		return
+	}
 
 	word = make([]byte, wordLen)
 	tags = make([]byte, tagsLen)
 
 	_, err = r.Read(word)
-	check(err)
+	if err != nil {
+		return
+	}
 
 	_, err = r.Read(tags)
-	check(err)
+	if err != nil {
+		return
+	}
 
 	return
-}
-
-func check(err error) {
-	if err != nil {
-		panic(err)
-	}
 }
