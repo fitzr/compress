@@ -1,11 +1,13 @@
 package compress
 
+import "io"
+
 const (
 	topBit     = 128
 	byteMaxLen = 10
 )
 
-func Encode(n uint64) []byte {
+func Encode(w io.Writer, n uint64) error {
 	bytes := [byteMaxLen]byte{}
 	i := byteMaxLen - 1
 	for {
@@ -17,18 +19,23 @@ func Encode(n uint64) []byte {
 		n /= topBit
 	}
 	bytes[byteMaxLen-1] += topBit
-	return bytes[i:]
+	_, err := w.Write(bytes[i:])
+	return err
 }
 
-func Decode(bytes []byte) uint64 {
-	n := uint64(0)
-	for _, b := range bytes {
-		v := uint64(b)
+func Decode(r io.Reader) (n uint64, err error) {
+	b := make([]byte, 1)
+	for {
+		_, err = r.Read(b)
+		if err != nil {
+			return
+		}
+		v := uint64(b[0])
 		if v < topBit {
 			n = n*topBit + v
 		} else {
 			n = n*topBit + v - topBit
+			return
 		}
 	}
-	return n
 }
