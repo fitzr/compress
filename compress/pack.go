@@ -5,26 +5,26 @@ import (
 	"io"
 )
 
-func Pack(w io.Writer, word, tags []byte) (err error) {
-	wordLen := uint32(len(word))
-	tagsLen := uint32(len(tags))
+func Pack(w io.Writer, name, ids []byte) (err error) {
+	nameLen := uint32(len(name))
+	idsLen := uint32(len(ids))
 
-	err = binary.Write(w, binary.LittleEndian, wordLen)
+	err = binary.Write(w, binary.LittleEndian, nameLen)
 	if err != nil {
 		return
 	}
 
-	err = binary.Write(w, binary.LittleEndian, tagsLen)
+	err = binary.Write(w, binary.LittleEndian, idsLen)
 	if err != nil {
 		return
 	}
 
-	_, err = w.Write(word)
+	_, err = w.Write(name)
 	if err != nil {
 		return
 	}
 
-	_, err = w.Write(tags)
+	_, err = w.Write(ids)
 	if err != nil {
 		return
 	}
@@ -32,28 +32,28 @@ func Pack(w io.Writer, word, tags []byte) (err error) {
 	return
 }
 
-func Unpack(r io.Reader) (word, tags []byte, err error) {
-	var wordLen uint32
-	var tagsLen uint32
-	err = binary.Read(r, binary.LittleEndian, &wordLen)
+func Unpack(r io.Reader) (name, ids []byte, err error) {
+	var nameLen uint32
+	var idsLen uint32
+	err = binary.Read(r, binary.LittleEndian, &nameLen)
 	if err != nil {
 		return
 	}
 
-	err = binary.Read(r, binary.LittleEndian, &tagsLen)
+	err = binary.Read(r, binary.LittleEndian, &idsLen)
 	if err != nil {
 		return
 	}
 
-	word = make([]byte, wordLen)
-	tags = make([]byte, tagsLen)
+	name = make([]byte, nameLen)
+	ids = make([]byte, idsLen)
 
-	_, err = r.Read(word)
+	_, err = r.Read(name)
 	if err != nil {
 		return
 	}
 
-	_, err = r.Read(tags)
+	_, err = r.Read(ids)
 	if err != nil {
 		return
 	}
