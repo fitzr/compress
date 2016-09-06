@@ -5,9 +5,12 @@ import (
 	"github.com/fitzr/compression-sample/compress"
 	"log"
 	"os"
+	"github.com/pkg/profile"
 )
 
 func main() {
+
+	defer profile.Start().Stop()
 
 	c := flag.Bool("c", false, "compress")
 	d := flag.Bool("d", false, "decompress")
