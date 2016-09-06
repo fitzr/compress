@@ -8,8 +8,8 @@ import (
 )
 
 func Compress(r io.Reader, w io.Writer) {
-	reader := bufio.NewReaderSize(r, 1024 * 256)
-	writer := bufio.NewWriterSize(w, 1024 * 256)
+	reader := bufio.NewReaderSize(r, 1024*256)
+	writer := bufio.NewWriterSize(w, 1024*256)
 	for compressLine(reader, writer) {
 	}
 	writer.Flush()
@@ -24,8 +24,11 @@ func compressLine(r *bufio.Reader, w io.Writer) bool {
 
 	if readErr == nil && packErr == nil {
 		return true
+	} else if packErr == nil && readErr.Error() == "EOF" {
+		log.Println("finished")
+		return false
 	} else {
-		log.Println("err read : ", readErr, " pack : ", packErr)
+		log.Println("err read:", readErr, " pack:", packErr)
 		return false
 	}
 }
@@ -44,7 +47,7 @@ func readLine(r *bufio.Reader) (name string, tagStrings []string, err error) {
 
 func readString(r *bufio.Reader, delimiter byte) (str string, err error) {
 	str, err = r.ReadString(delimiter)
-	if err == nil || err.Error() != "EOF"{
+	if err == nil || err.Error() != "EOF" {
 		str = str[:len(str)-1]
 	}
 	return

@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"github.com/fitzr/compression-sample/compress"
+	"github.com/pkg/profile"
 	"log"
 	"os"
-	"github.com/pkg/profile"
 )
 
 func main() {

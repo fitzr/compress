@@ -29,7 +29,7 @@ func restoreFromDiff(idNumbers []uint64) {
 	}
 }
 
-func toIntArray(strings []string) []uint64{
+func toIntArray(strings []string) []uint64 {
 	numbers := make([]uint64, len(strings))
 	for i, v := range strings {
 		n, err := strconv.ParseUint(v, 10, 64)
