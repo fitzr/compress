@@ -44,7 +44,7 @@ func readLine(r *bufio.Reader) (name string, tagStrings []string, err error) {
 
 func readString(r *bufio.Reader, delimiter byte) (str string, err error) {
 	str, err = r.ReadString(delimiter)
-	if str != "" {
+	if err == nil || err.Error() != "EOF"{
 		str = str[:len(str)-1]
 	}
 	return
