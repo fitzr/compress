@@ -14,15 +14,16 @@ func Compress(r io.Reader, w io.Writer) {
 }
 
 func compressLine(r *bufio.Reader, w io.Writer) bool {
-	name, idStrings, err := readLine(r)
+	name, idStrings, readErr := readLine(r)
+	var packErr error
 	if name != "" && len(idStrings) > 0 {
-		Pack(w, []byte(name), CompressIds(idStrings))
+		packErr = Pack(w, []byte(name), CompressIds(idStrings))
 	}
 
-	if err == nil {
+	if readErr == nil && packErr == nil {
 		return true
 	} else {
-		log.Println("read line error : ", err)
+		log.Println("err read : ", readErr, " pack : ", packErr)
 		return false
 	}
 }
