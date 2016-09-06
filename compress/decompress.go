@@ -11,6 +11,7 @@ func Decompress(r io.Reader, w io.Writer) {
 	writer := bufio.NewWriter(w)
 	for decompressLine(r, writer) {
 	}
+	defer writer.Flush()
 }
 
 func decompressLine(r io.Reader, w *bufio.Writer) bool {
