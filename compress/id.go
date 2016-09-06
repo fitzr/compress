@@ -6,34 +6,60 @@ import (
 )
 
 func CompressIds(idStrings []string) []byte {
-	// from string to unsigned int 64
-	idNumbers := make([]uint64, len(idStrings))
-	for i, v := range idStrings {
+	idNumbers := toIntArray(idStrings)
+	toDiff(idNumbers)
+	return encode(idNumbers)
+}
+
+func DecompressIds(idBytes []byte) []string {
+	idNumbers := decode(idBytes)
+	restoreFromDiff(idNumbers)
+	return toStringArray(idNumbers)
+}
+
+func toDiff(idNumbers []uint64) {
+	for i := len(idNumbers) - 1; i > 0; i-- {
+		idNumbers[i] -= idNumbers[i-1]
+	}
+}
+
+func restoreFromDiff(idNumbers []uint64) {
+	for i := 1; i < len(idNumbers); i++ {
+		idNumbers[i] += idNumbers[i-1]
+	}
+}
+
+func toIntArray(strings []string) []uint64{
+	numbers := make([]uint64, len(strings))
+	for i, v := range strings {
 		n, err := strconv.ParseUint(v, 10, 64)
 		if err != nil {
 			panic(err)
 		}
-		idNumbers[i] = n
+		numbers[i] = n
 	}
+	return numbers
+}
 
-	// to first number and diff numbers
-	for i := len(idNumbers) - 1; i > 0; i-- {
-		idNumbers[i] -= idNumbers[i-1]
+func toStringArray(numbers []uint64) []string {
+	strings := make([]string, len(numbers))
+	for i, v := range numbers {
+		strings[i] = strconv.FormatUint(v, 10)
 	}
+	return strings
+}
 
-	// encode
+func encode(numbers []uint64) []byte {
 	buff := new(bytes.Buffer)
-	for _, id := range idNumbers {
+	for _, id := range numbers {
 		Encode(buff, id)
 	}
 	return buff.Bytes()
 }
 
-func DecompressIds(idBytes []byte) []string {
-	idNumbers := make([]uint64, 0)
-	r := bytes.NewReader(idBytes)
-
-	// decode
+func decode(data []byte) []uint64 {
+	numbers := make([]uint64, 0)
+	r := bytes.NewReader(data)
 	for {
 		n, err := Decode(r)
 		if err != nil {
@@ -43,18 +69,7 @@ func DecompressIds(idBytes []byte) []string {
 				panic(err)
 			}
 		}
-		idNumbers = append(idNumbers, n)
+		numbers = append(numbers, n)
 	}
-
-	// from diff to actual number
-	for i := 1; i < len(idNumbers); i++ {
-		idNumbers[i] += idNumbers[i-1]
-	}
-
-	// from unsigned int 64 to string
-	idStrings := make([]string, len(idNumbers))
-	for i, v := range idNumbers {
-		idStrings[i] = strconv.FormatUint(v, 10)
-	}
-	return idStrings
+	return numbers
 }
