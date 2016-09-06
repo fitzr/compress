@@ -8,10 +8,11 @@ import (
 )
 
 func Decompress(r io.Reader, w io.Writer) {
-	writer := bufio.NewWriter(w)
-	for decompressLine(r, writer) {
+	reader := bufio.NewReaderSize(r, 1024 * 256)
+	writer := bufio.NewWriterSize(w, 1024 * 256)
+	for decompressLine(reader, writer) {
 	}
-	defer writer.Flush()
+	writer.Flush()
 }
 
 func decompressLine(r io.Reader, w *bufio.Writer) bool {

@@ -33,30 +33,33 @@ func Pack(w io.Writer, name, ids []byte) (err error) {
 }
 
 func Unpack(r io.Reader) (name, ids []byte, err error) {
-	var nameLen uint32
-	var idsLen uint32
-	err = binary.Read(r, binary.LittleEndian, &nameLen)
+	bytes, err := read(r, 4)
+	if err != nil {
+		return
+	}
+	nameLen := binary.LittleEndian.Uint32(bytes)
+
+	bytes, err = read(r, 4)
+	if err != nil {
+		return
+	}
+	idsLen := binary.LittleEndian.Uint32(bytes)
+
+	name, err = read(r, nameLen)
 	if err != nil {
 		return
 	}
 
-	err = binary.Read(r, binary.LittleEndian, &idsLen)
-	if err != nil {
-		return
-	}
-
-	name = make([]byte, nameLen)
-	ids = make([]byte, idsLen)
-
-	_, err = r.Read(name)
-	if err != nil {
-		return
-	}
-
-	_, err = r.Read(ids)
+	ids, err = read(r, idsLen)
 	if err != nil {
 		return
 	}
 
 	return
+}
+
+func read(r io.Reader, size uint32) (bytes []byte, err error) {
+	bytes = make([]byte, size)
+	_, err = io.ReadFull(r, bytes)
+	return bytes, err
 }
