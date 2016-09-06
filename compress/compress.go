@@ -8,9 +8,11 @@ import (
 )
 
 func Compress(r io.Reader, w io.Writer) {
-	reader := bufio.NewReader(r)
-	for compressLine(reader, w) {
+	reader := bufio.NewReaderSize(r, 1024 * 256)
+	writer := bufio.NewWriterSize(w, 1024 * 256)
+	for compressLine(reader, writer) {
 	}
+	writer.Flush()
 }
 
 func compressLine(r *bufio.Reader, w io.Writer) bool {
