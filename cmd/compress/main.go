@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/fitzr/compression-sample/compress"
+	"github.com/fitzr/compress"
 	"github.com/pkg/profile"
 	"log"
 	"os"
